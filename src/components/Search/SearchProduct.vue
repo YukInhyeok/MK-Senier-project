@@ -2,18 +2,7 @@
   <div class="SearchProduct">
     <!-- 검색  -->
     <br>
-    <div class="category-options">
-      <h2>검색 카테고리</h2>
-    <div class="searchOption">
-      <div class="category-option-list">
-        <v-checkbox class="category-option" v-model="selectedOption" label="전체" value="All"></v-checkbox>
-      </div>
-      <div class="category-option-list" v-for="option in options.slice(1)" :key="option.value">
-        <v-checkbox class="category-option" v-model="selectedOption" :label="option.text" :value="option.value"></v-checkbox>
-      </div>
-    </div>
-    </div>
-    <h1>상품 검색</h1>
+    <h1>상품을 검색하세요</h1>
     <div class="search-input">
       <v-text-field v-model="searchText" label="검색어를 입력하세요" @input="searchProducts" @keyup.enter="searchProducts">
       </v-text-field>
@@ -21,9 +10,18 @@
     </div>
 
     <!-- 카테고리 선택  -->
+    <div class="category-options">
+      <h2>카테고리 선택</h2>
+      <div class="category-option-list">
+        <v-checkbox class="category-option" v-model="selectedOption" label="전체" value="All"></v-checkbox>
+        <v-checkbox class="category-option" v-model="selectedOption" v-for="option in options.slice(1)"
+          :key="option.value" :label="option.text" :value="option.value">
+        </v-checkbox>
+      </div>
+    </div>
 
 
-    <!-- 검색 결과  --> 
+    <!-- 검색 결과  -->
     <div class="search-result" v-if="searchResults.length > 0">
       <h2>검색 결과 총 {{ searchResults.length }}개</h2>
       <ul>
@@ -31,14 +29,16 @@
           <v-checkbox v-model="selectedResults" :label="getProductLabel(product)" :value="product"></v-checkbox>
           <button @click="openSearchDialog(product)" class="search-btn-menu">자세히</button>
         </li>
+        <button v-if="canLoadMore" @click="loadMore" class="search-btn">결과 더 보기</button>
         <br>
-        <button v-if="selectedResults.length > 0" @click="showSelectedProducts" class="search-btn">선택한 상품 보기</button>
+        <button v-if="selectedResults.length > 0" @click="showSelectedProducts" class="search-btn">총
+          {{ selectedResults.length }}개 선택한 상품 보기</button>
       </ul>
     </div>
 
     <!-- 검색 아무것도 안했을때 결과   -->
     <div v-else>
-      <p class ="noSearch" >검색 결과가 없거나, 아직 검색을 하지 않았습니다.</p>
+      <p style="text-align: center; border-top:1px solid #a6a7a8;">검색 결과가 없거나, 아직 검색을 하지 않았습니다.</p>
     </div>
 
   </div>
@@ -67,11 +67,11 @@
 </template>
 
 <script>
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, query, orderBy, startAfter, limit, getDocs } from 'firebase/firestore';
 
 export default {
   props: ['isLoggedIn', 'loginInfo'],
-  emits: ['login', 'logout'],
+  emits: ['login', 'logout', 'selected-products'],
   data() {
     return {
       product: {
@@ -83,10 +83,10 @@ export default {
       },
       options: [
         { value: 'All', text: '전체' },
-        { value: 'Clothes', text: '의류' },
-        { value: 'Food', text: '식품' },
-        { value: 'Home', text: '생활' },
-        { value: 'Service', text: '서비스' },
+        { value: 'Clothes', text: '의류•패션' },
+        { value: 'Food', text: '식품•요리' },
+        { value: 'Home', text: '주거•생활' },
+        { value: 'Service', text: '근린•서비스' },
       ],
       products: [],
       searchText: '',
@@ -95,21 +95,43 @@ export default {
       selectedResults: [],
       dialogOpen: false,
       selectedProduct: null,
+      lastVisible: null,
+      pageSize: 10, // 검색된 상품 갯수, 전체 갯수 보다 적으면 (결과 더보기) 버튼이 나옴
+      canLoadMore: false,
     };
   },
   methods: {
     async searchProducts() {
       try {
         const db = getFirestore();
-        const querySnapshot = await getDocs(collection(db, 'products'));
+        let productsQuery = query(collection(db, 'products'), orderBy('name'), limit(this.pageSize));
+
+        if (this.lastVisible) {
+          productsQuery = query(collection(db, 'products'), orderBy('name'), startAfter(this.lastVisible), limit(this.pageSize));
+        }
+
+        const querySnapshot = await getDocs(productsQuery);
+
+        this.lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+
         const products = querySnapshot.docs.map(doc => doc.data());
-        this.searchResults = products.filter(product => {
+
+        this.searchResults.push(...products.filter(product => {
           const nameIncludesSearchText = product.name.toLowerCase().includes(this.searchText.toLowerCase().trim());
           const categoryMatchesFilter = this.selectedOption === 'All' || product.category === this.selectedOption;
           return nameIncludesSearchText && categoryMatchesFilter;
-        });
+        }));
+
+        // If the number of results is less than the page size, there are no more results to load.
+        this.canLoadMore = querySnapshot.docs.length >= this.pageSize;
       } catch (error) {
         console.error('검색 실패:', error);
+      }
+    },
+
+    loadMore() {
+      if (this.canLoadMore) {
+        this.searchProducts();
       }
     },
     getProductLabel(product) {
@@ -123,12 +145,15 @@ export default {
       this.dialogOpen = false;
     },
     showSelectedProducts() {
-      for (const product of this.selectedResults) {
-        this.$router.push('/SearchMap');
-        console.log('선택한 상품:', product);
-      }
+      this.$router.push({
+  path: '/SearchMap',
+  query: { selectedProducts: JSON.stringify(this.selectedResults) }
+});
+
+      console.log('전달한 상품:', this.selectedResults);
       this.$emit('selected-products', this.selectedResults);
-    },
+    }
+
   },
 };
 </script>
@@ -163,6 +188,7 @@ export default {
   border-radius: 4px;
   cursor: pointer;
 }
+
 .search-btn-menu {
   display: inline-block;
   margin-left: 15px;
@@ -190,13 +216,13 @@ export default {
 }
 
 .category-option-list {
-display: grid;
+  display: flex;
+  flex-direction: row;
 }
 
 .category-option {
-  width: 100%;
-  display: grid;
-
+  margin-right: 10px;
+  /* 오른쪽 여백 추가 */
 }
 
 .search-result {
@@ -224,6 +250,10 @@ display: grid;
   margin-bottom: 5px;
 }
 
+.search-result button {
+  border: 1px solid #000;
+}
+
 .product-info {
   margin-bottom: 20px;
   white-space: pre-line;
@@ -242,14 +272,5 @@ display: grid;
 
 .form-group {
   margin-bottom: 1rem;
-}
-.searchOption{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.noSearch{
-  text-align: center; 
-  border-top:1px solid #a6a7a8;
 }
 </style>

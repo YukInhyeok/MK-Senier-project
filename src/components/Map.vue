@@ -1,20 +1,22 @@
 <template>
-   <div style="width: 100%; text-align: center; padding:20px" >
-      나의 근처 상점들 
-    </div>
+  <br>
     <div id="map">
     </div>
-   
+    <div style="width: 100%; height: 100%; text-align: center; padding:20px" >
+      현재 나의 위치
+    </div>
   </template>
   
   <script>
-  
+  import { getFirestore, collection, getDocs } from 'firebase/firestore';
+
   export default {
     name : "marketMap",
     data() {
       return {
         latitude: null,
-        longitude: null
+        longitude: null,
+        stores: []
       };
     },
     mounted() {
@@ -25,14 +27,60 @@
       document.head.appendChild(script);
   
       script.onload = () => {
-        window.kakao.maps.load(() => {
+        window.kakao.maps.load(async () => {
           const container = document.getElementById('map');
           const options = {
             center: new window.kakao.maps.LatLng(36.3296, 127.4332),
             level: 1
           };
           const map = new window.kakao.maps.Map(container, options);
-  
+
+          
+      // Firebase에서 매장을 가져옵니다.
+      try {
+        const db = getFirestore();
+        const storesCollection = collection(db, 'stores');
+        const querySnapshot = await getDocs(storesCollection);
+
+        this.stores = querySnapshot.docs.map((doc) => doc.data());
+
+        // 상점을 반복하고 각 상점에 대한 마커를 추가합니다.
+        this.stores.forEach((store) => {
+          let latitude, longitude;
+
+          if (typeof store.location === 'string') {
+            const coordinates = store.location.split(',');
+            latitude = parseFloat(coordinates[0]);
+            longitude = parseFloat(coordinates[1]);
+          } else if (typeof store.location === 'object' && store.location.lat && store.location.lng) {
+            latitude = store.location.lat;
+            longitude = store.location.lng;
+          }
+
+          if (!isNaN(latitude) && !isNaN(longitude)) {
+            // Create a new marker and add it to the map
+            const markerPosition = new window.kakao.maps.LatLng(latitude, longitude);
+            // Marker 생성
+            const marker = new window.kakao.maps.Marker({
+              position: markerPosition,
+              map: map,
+              title: store.storename // 마커 위로 마우스를 가져가면 표시됩니다.
+            });
+            // Marker에 클릭 이벤트 리스너 등록
+            window.kakao.maps.event.addListener(marker, 'click', () => {
+              const infowindow = new window.kakao.maps.InfoWindow({
+                content: ('상점 이름: ' + store.storename + '<br>설명: ' + (store.description || '')) 
+                // 상점 이름과 설명을 표시합니다. 설명이 없으면 빈 문자열이 표시됩니다.
+              });
+              infowindow.open(map, marker);
+            });
+          }
+          
+        });
+      } catch (error) {
+         console.error('Failed to fetch stores:', error);
+       }
+
           // 현재 위치 표시
           if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((position) => {
@@ -84,7 +132,7 @@
   <style scoped>
   #map {
     width: 90%;
-    height: 90%;
+    height: 50%;
     margin: 0 auto;
     border: 1px #000 solid ;
   }

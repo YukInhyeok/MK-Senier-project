@@ -1,114 +1,103 @@
 <template>
-    <div class = "SearchMap">
-      
+  <br>
+    <div id="map">
     </div>
-  </template>
-  
-  <script>
-  import { getFirestore, collection, getDocs, } from 'firebase/firestore';
-  
-  export default {
-    name : 'SearchMap',
-    emits: ['login', 'logout'],
-    props: {isLoggedIn: Boolean,loginInfo: null
-    },
-    data() {
-      return {
-        props: ['isLoggedIn', 'loginInfo'],
-        emits: ['login', 'logout'],
-        product: {
-          category: '',
-          subCategory: '',
-          name: '',
-          price: '',
-          description: '',
-        },
-        options: [
-          { value: 'All', text: '전체' },
-          { value: 'Clothes', text: '의류•패션' },
-          { value: 'Food', text: '식품•요리' },
-          { value: 'Home', text: '주거•생활' },
-          { value: 'Service', text: '근린•서비스' },
-        ],
-        products: [
-          // 상품들의 배열
-          // { id, name, price, category, subCategory, ... }
-        ],
-        searchText: '',
-        selectedOption: 'All',
-        searchResults: [],
-        selectedResults: [],
-        dialogOpen: false,
-        selectedProduct: null,
-      };
-    },
-    methods: {
-  
-      async searchProducts() {
-        try {
-          const db = getFirestore();
-          const querySnapshot = await getDocs(collection(db, 'products'));
-          this.searchResults = querySnapshot.docs
-          const products = querySnapshot.docs.map(doc => doc.data());
-          this.searchResults = products.filter(product => {
-            const nameIncludesSearchText = product.name.toLowerCase().includes(this.searchText.toLowerCase().trim());
-            const categoryMatchesFilter = this.selectedOption === 'All' || product.category === this.selectedOption;
-  
-            return nameIncludesSearchText && categoryMatchesFilter;
-          });
-        } catch (error) {
-          console.error('검색 실패:', error);
+    <div style="width: 100%; height: 100%; text-align: center; padding:20px" >
+      선택한 상품의 상점 위치
+    </div>
+</template>
+
+<script>
+import { initializeApp, getApps } from 'firebase/app';
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAjh-tLB9jHUFxtvf1OlFTN4TU9p0u-VTQ",
+  authDomain: "tdmk-595a3.firebaseapp.com",
+  databaseURL: "https://tdmk-595a3-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "tdmk-595a3",
+  storageBucket: "tdmk-595a3.appspot.com",
+  messagingSenderId: "849130639775",
+  appId: "1:849130639775:web:e4d64bda00fd4a4d89adaa",
+  measurementId: "G-QXH609W16C"
+};
+
+if (!getApps().length) {
+ initializeApp(firebaseConfig);
+}
+const db = getFirestore();
+
+export default {
+ name : 'SearchMap',
+ data() {
+   return {
+     map:null,
+     markers:[],
+     selectedProducts:[],
+     stores:[]
+   };
+ },
+ async mounted() {
+  this.selectedProducts = JSON.parse(this.$route.query.selectedProducts); 
+  console.log("받은 정보 : ",this.selectedProducts)
+
+  const script = document.createElement('script');
+  script.async = true;
+        "//dapi.kakao.com/v2/maps/sdk.js?autoload=false&appkey=46a783bba3ff193bea6e663af44c3b84";
+      document.head.appendChild(script);
+
+  const loadKakaoMapAPI = new Promise((resolve) => {
+    script.onload = () => {
+      window.kakao.maps.load(() => {
+        const container = document.getElementById('map');
+        const options = {
+          center: new window.kakao.maps.LatLng(36.3296,127.4332),
+          level :3
+        };
+        this.map=new window.kakao.maps.Map(container,options);
+        resolve();
+      });
+    };
+  });
+
+  // Wait for both the map API and the store data to be ready before creating markers
+  Promise.all([loadKakaoMapAPI, this.fetchStores()])
+    .then(() => { 
+      if(this.selectedProducts && this.selectedProducts.length>0){
+        for(let product of this.selectedProducts){
+          let store=this.stores.find(store=>store.Stnum===product.stnum);
+          if(store){
+            let locationData=store.location;
+            let latLng=new window.kakao.maps.LatLng(locationData.lat,locationData.lng);
+            let marker=new window.kakao.maps.Marker({position :latLng});
+            marker.setMap(this.map);
+            this.markers.push(marker);
+          }
         }
-      },
-      // 검색 결과 출력 형태 
-      getProductLabel(product) {
-        return ` 상품명 : ${product.name} 가격 : ${product.price}원`;
-      },
-      openSearchDialog(product) {
-        this.selectedProduct = product;
-        this.dialogOpen = true;
-      },
-      closeSearchDialog() {
-        this.dialogOpen = false;
-      },
-      showSelectedProducts() {
-        for (const product of this.selectedResults) {
-          console.log('선택한 상품:', product);
-        }
-        this.$emit('selected-products', this.selectedResults);
-      },
-    },
-  };
-  </script>
-  
-  <style scoped>
-  /* 필요한 스타일을 추가해주세요 */
-  .search-input {
-    display: flex;
-    align-items: center;
-    flex: 1;
-  }
-  
-  .SearchSlectDialog {
-    padding: 0 16px;
-  }
-  
-  .search-btn {
-    align-items: center;
-    margin-left: 8px;
-    min-width: 100px;
-    height: 48px;
-    font-size: 16px;
-    padding: 0 16px;
-    background-color: aqua;
-  }
-  
-  .category-options {
-    display: flex;
-  }
-  
-  .category-options v-checkbox {
-    margin-right: 16px;
-  }
-  </style>
-  
+      }
+     })
+     .catch(error => { console.error('Failed to load map API or fetch stores:', error); });
+},
+ methods: {
+  // Fetch store data from Firestore
+  async fetchStores() {
+    try {
+      const storesCollection = collection(db, 'stores');
+      const querySnapshot = await getDocs(storesCollection);
+
+      this.stores = querySnapshot.docs.map((doc) => doc.data());
+
+    } catch (error) {
+      console.error('Failed to fetch stores:', error);
+    }
+  },
+}
+};
+</script>
+
+<style>
+#map {
+  width: 100%;
+  height: 500px; /* or any other size you want */
+}
+</style>
