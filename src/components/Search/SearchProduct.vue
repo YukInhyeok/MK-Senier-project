@@ -1,17 +1,8 @@
 <template>
   <div class="SearchProduct">
-    <!-- 검색  -->
-    <br>
-    <h1>상품을 검색하세요</h1>
-    <div class="search-input">
-      <v-text-field v-model="searchText" label="검색어를 입력하세요" @input="searchProducts" @keyup.enter="searchProducts">
-      </v-text-field>
-      <v-btn @click="searchProducts" class="search-btn">검색</v-btn>
-    </div>
-
     <!-- 카테고리 선택  -->
     <div class="category-options">
-      <h2>카테고리 선택</h2>
+      <h2>검색 카테고리 선택</h2>
       <div class="category-option-list">
         <v-checkbox class="category-option" v-model="selectedOption" label="전체" value="All"></v-checkbox>
         <v-checkbox class="category-option" v-model="selectedOption" v-for="option in options.slice(1)"
@@ -19,11 +10,15 @@
         </v-checkbox>
       </div>
     </div>
-
-
+    <!-- 검색  -->
+    <div class="search-input">
+      <v-text-field v-model="searchText" @input="searchProducts" @keyup.enter="searchProducts"></v-text-field>
+      <button @click="searchProducts" class="search">검색</button>
+    </div>
     <!-- 검색 결과  -->
     <div class="search-result" v-if="searchResults.length > 0">
       <h2>검색 결과 총 {{ searchResults.length }}개</h2>
+      <p style="font-size: 13px; font-style: bold; text-align: center; margin-bottom: 12px;">상품 선택 시 해당 상품의 상점 위치확인이 가능합니다</p>
       <ul>
         <li v-for="product in searchResults" :key="product.id">
           <v-checkbox v-model="selectedResults" :label="getProductLabel(product)" :value="product"></v-checkbox>
@@ -35,19 +30,16 @@
           {{ selectedResults.length }}개 선택한 상품 보기</button>
       </ul>
     </div>
-
     <!-- 검색 아무것도 안했을때 결과   -->
     <div v-else>
       <p style="text-align: center; border-top:1px solid #a6a7a8;">검색 결과가 없거나, 아직 검색을 하지 않았습니다.</p>
     </div>
-
   </div>
-
   <!-- 다이얼로그 자세히 버튼 눌렀을 때 나오게 끔 한거 -->
-  <v-dialog class="SearchSlectDialog" v-model="dialogOpen" max-width="500">
+  <v-dialog class="SearchSlectDialog" v-model="dialogOpen" max-width="600">
     <v-card>
-      <v-card-title>
-        <h2>상품 상세 정보</h2>
+      <v-card-title style="">
+        <h3>상품 상세 정보</h3>
       </v-card-title>
       <v-card-text>
         <div class="product-info">
@@ -59,7 +51,7 @@
         </div>
         <br>
         <div class="dialog-actions">
-          <button @click="closeSearchDialog" class="search-btn">닫기</button>
+          <button @click="closeSearchDialog" class="close-btn">닫기</button>
         </div>
       </v-card-text>
     </v-card>
@@ -83,10 +75,10 @@ export default {
       },
       options: [
         { value: 'All', text: '전체' },
-        { value: 'Clothes', text: '의류•패션' },
-        { value: 'Food', text: '식품•요리' },
-        { value: 'Home', text: '주거•생활' },
-        { value: 'Service', text: '근린•서비스' },
+        { value: 'Clothes', text: '패션' },
+        { value: 'Food', text: '요리' },
+        { value: 'Home', text: '생활' },
+        { value: 'Service', text: '서비스' },
       ],
       products: [],
       searchText: '',
@@ -146,9 +138,9 @@ export default {
     },
     showSelectedProducts() {
       this.$router.push({
-  path: '/SearchMap',
-  query: { selectedProducts: JSON.stringify(this.selectedResults) }
-});
+        path: '/SearchMap',
+        query: { selectedProducts: JSON.stringify(this.selectedResults) }
+      });
 
       console.log('전달한 상품:', this.selectedResults);
       this.$emit('selected-products', this.selectedResults);
@@ -166,17 +158,26 @@ export default {
 }
 
 .search-input {
+  margin-right: auto;
+  margin-left: auto;
+  width: 95%;
   display: flex;
   align-items: center;
   text-align: center;
-  margin-top: 10px;
-  margin-left: 10px;
 }
-
+.search{
+    margin-top: -22px;
+    min-width: 100px;
+    height: 55px;
+    font-size: 12px;
+    background-color: #4285f4;
+    color: white;
+    border-radius: 10px;
+    cursor: pointer;
+}
 .search-btn {
   display: inline-block;
   margin-left: 10px;
-  margin-bottom: 25px;
   min-width: 120px;
   height: 50px;
   font-size: 18px;
@@ -190,87 +191,74 @@ export default {
 }
 
 .search-btn-menu {
-  display: inline-block;
-  margin-left: 15px;
-  margin-bottom: 5px;
+  margin-right: 10px;
   min-width: 120px;
-  height: 50px;
-  font-size: 15px;
-  font-weight: bold;
-  padding: 0 16px;
-  background-color: #199356;
+  height: 35px;
+  font-size: 12px;
+  background-color: #4285f4;
   color: white;
-  border: none;
-  border-radius: 4px;
+  border-radius: 15px;
   cursor: pointer;
 }
-
 .category-options {
   margin-bottom: 10px;
 }
-
 .category-options h2 {
+  margin-top: 20px;
   margin-bottom: 10px;
   font-size: 20px;
   color: #000000;
 }
-
 .category-option-list {
   display: flex;
-  flex-direction: row;
+  justify-self: center;
+  align-items: center;
+  font-size: 10px;
 }
-
 .category-option {
-  margin-right: 10px;
   /* 오른쪽 여백 추가 */
 }
-
 .search-result {
   margin-top: 10px;
-  margin-bottom: 200px;
   border: 1px solid #ccc;
   padding: 10px;
   border-radius: 4px;
 }
-
 .search-result h2 {
   font-size: 24px;
   color: #333;
   margin-bottom: 10px;
 }
-
 .search-result ul {
   list-style-type: none;
   padding-left: 0;
 }
-
 .search-result li {
+  border: 1px solid #ccc;
   display: flex;
   align-items: center;
-  margin-bottom: 5px;
+  margin-bottom: 12px;
 }
-
-.search-result button {
-  border: 1px solid #000;
-}
-
 .product-info {
   margin-bottom: 20px;
   white-space: pre-line;
 }
-
 .info-label {
   font-weight: bold;
   margin-right: 5px;
   margin-bottom: 20px;
 }
-
 .dialog-actions {
   text-align: center;
   margin-top: 20px;
 }
-
-.form-group {
-  margin-bottom: 1rem;
+.close-btn{
+  border: 1px solid rgb(250, 114, 114);
+  min-width: 120px;
+  color: rgb(247, 73, 73);
+}
+.close-btn:hover{
+  background: rgb(250, 114, 114);
+  color: rgb(255, 255, 255);
 }
 </style>

@@ -1,29 +1,27 @@
 <template>
-  <br>
+<br/>
+  <div>
   <div class="signup-container">
-    <h1>판매자 회원가입</h1>
+    <h3>판매자 회원가입</h3>
     <form @submit.prevent="register" class="form">
       <div class="form-group">
-        <label for="username" class="form-label">이름</label>
-        <input type="text" id="username" v-model="username" class="form-input" required placeholder="이름을 입력하세요.">
+        <input type="text" id="username" v-model="username" class="form-input" required placeholder="이름">
       </div>
       <div class="form-group">
-        <label for="email" class="form-label">이메일</label>
-        <input type="email" id="email" v-model="email" class="form-input" required placeholder="이메일을 입력하세요.">
+        <input type="email" id="email" v-model="email" class="form-input" required placeholder="이메일">
       </div>
       <div class="form-group">
-        <label for="password" class="form-label">비밀번호</label>
-        <input type="password" id="password" v-model="password" class="form-input" required placeholder="비밀번호를 입력하세요.">
+        <input type="password" id="password" v-model="password" class="form-input" required placeholder="비밀번호">
       </div>
       <div class="form-group">
-        <label for="phone" class="form-label">전화번호</label>
-        <input type="tel" id="phone" v-model="phone" class="form-input" required placeholder="전화번호를 입력하세요.">
+        <input type="tel" id="phone" v-model="phone" class="form-input" required placeholder="전화번호">
       </div>
       <button type="submit" class="form-button">가입하기</button>
     </form>
     <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
     <div v-if="successMessage" class="success-message">{{ successMessage }}</div>
   </div>
+</div>
 </template>
 
 <script>
@@ -108,7 +106,7 @@ export default {
 
 <style>
 .signup-container {
-  max-width: 400px;
+  width: 95%;
   margin: 0 auto;
   padding: 20px;
   border: 1px solid #ccc;
@@ -116,8 +114,8 @@ export default {
   background-color: #fff;
 }
 
-h1 {
-  font-size: 24px;
+h3 {
+
   text-align: center;
 }
 
@@ -130,8 +128,11 @@ h1 {
 }
 
 .form-label {
-  display: block;
-  margin-bottom: 5px;
+  max-width: 100px;
+  text-align: center;
+  border: 1px solid;
+  margin-left: 12px;
+  margin-bottom: 8px;
   font-weight: bold;
   font-size: 14px;
 }
@@ -146,6 +147,7 @@ h1 {
 
 .form-button {
   width: 100%;
+  margin-top: 12px;
   padding: 8px;
   border: none;
   border-radius: 5px;
@@ -173,4 +175,5 @@ h1 {
   background-color: #4caf50;
   color: #fff;
 }
+
 </style>

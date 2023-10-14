@@ -68,7 +68,7 @@ export default {
   padding: 20px;
   border: 1px solid #ccc;
   border-radius: 5px;
-  background-color: #f7f7f7;
+  background-color: white;
   text-align: center;
 }
 

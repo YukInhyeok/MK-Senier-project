@@ -8,11 +8,11 @@
         <!-- if user is not logged in -->
         <form @submit.prevent="login" class="form">
           <div class="form-group">
-            <label for="email" class="form-label"></label>
+
             <input type="email" id="email" v-model="email" class="form-input" required placeholder="이메일">
           </div>
           <div class="form-group">
-            <label for="password" class="form-label"></label>
+
             <input type="password" id="password" v-model="password" class="form-input" required placeholder="비밀번호">
           </div>
           <br>

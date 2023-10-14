@@ -2,7 +2,7 @@
   <div class="store-gallery">
     <h2 style="padding: 25px;">중앙시장 상점목록</h2>
     <div class="store-grid">
-      <div v-for="(store, index) in stores" :key="index" class="store-item" style="margin-left: 5px; margin-right: 5px; margin-bottom: 5px;">
+      <div v-for="(store, index) in stores" :key="index" class="store-item" style="margin-left: 7px; margin-right: 7px; margin-bottom: 10px;">
         <div class="img_area">
         <img :src="store.image" alt="Store Image" class="store-image" />
       </div>
@@ -207,7 +207,6 @@ export default {
 .store-gallery {
   width: 100%;
   padding: 20px;
-
 }
 
 .store-grid {
@@ -251,16 +250,13 @@ export default {
 }
 .store-click {
   cursor: pointer;
-  border: 1px #888 solid;
   padding: 10px;
   border-radius: 10px;
   font-size: 10px;
-}
-
-.store-click:hover{
-  background-color: rgb(30, 97, 252);
+  background-color: #4285f4;
   color: #fff;
 }
+
 
 .modal {
   display: none;
@@ -282,7 +278,7 @@ export default {
   background-color: #fefefe;
   display: flex;
   flex-direction: column;
-  height: 800px;
+  height: 600px;
   /* 모달 창의 높이 조정 */
 }
 
@@ -313,12 +309,16 @@ export default {
 }
 .btnGroup{
   display: flex;
+  justify-content: center;
+  align-items: center;
 }
+
 .img_area{
   width: 100%;
   text-align: center;
   height: 100%;
   border: 1px solid #b8b8b8;
+  background-color: #fafafa;
   border-radius:12px
 }
 </style>

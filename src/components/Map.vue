@@ -3,7 +3,7 @@
     <div id="map">
     </div>
     <div style="width: 100%; height: 100%; text-align: center; padding:20px" >
-      현재 나의 위치
+      현재 위치
     </div>
   </template>
   
@@ -132,9 +132,9 @@
   <style scoped>
   #map {
     width: 90%;
-    height: 50%;
+    height: 80%;
     margin: 0 auto;
-    border: 1px #000 solid ;
+    border: 1px #c2c2c2 solid ;
   }
   
   .button-group {
