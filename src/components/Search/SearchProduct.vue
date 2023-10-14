@@ -215,9 +215,7 @@ export default {
   align-items: center;
   font-size: 10px;
 }
-.category-option {
-  /* 오른쪽 여백 추가 */
-}
+
 .search-result {
   margin-top: 10px;
   border: 1px solid #ccc;

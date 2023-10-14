@@ -2,19 +2,18 @@
   <div style="padding: 50px;">
     <h1>리뷰 작성하기</h1>
     <form @submit.prevent="submitReview">
-      <label for="name">이름</label>
-      <input v-model="review.name" type="text" id="name" required>
-      <label for="comment">리뷰</label>
-      <textarea v-model="review.comment" id="comment" required></textarea>
-      <label for="rating">별점</label>
-      <v-rating v-model="review.rating" :half-increments="true" background-color="#ccc"></v-rating>
+      <input v-model="review.name" type="text" class="name" required placeholder="이름">
+      <textarea v-model="review.comment" class="comment" required placeholder="리뷰 입력하기"></textarea>
+      별점<v-rating v-model="review.rating" :half-increments="true" background-color="#ccc"></v-rating>
       <button type="submit">리뷰 작성</button>
     </form>    
     <h1>리뷰 목록</h1>
-    <p>평균 별점: {{ averageRating }}점</p>
+    <p style="text-align: end;">평균 별점: <strong>{{ averageRating }}</strong>점</p>
     <ul>
       <li v-for="review in filteredReviews" :key="review.id">
-        <strong>{{ review.name }}:</strong> {{ review.comment }} ({{ review.rating }}점)
+        <p><strong>이름 : {{ review.name }}</strong></p>
+        <p><strong>리뷰 내용 :{{ review.comment }}</strong></p>
+        <p style="text-align: end;"><strong>별점 : {{ review.rating }}점</strong></p>
       </li>
     </ul>
     <StoreInfo :averageRating="averageRating" />
@@ -103,6 +102,7 @@ export default {
 <style scoped>
 /* 리뷰 작성 폼 스타일 */
 form {
+  
   display: flex;
   flex-direction: column;
   max-width: 300px;
@@ -119,13 +119,17 @@ label {
 
 input,
 textarea {
+  outline: none;
+  border-radius: 4px;
+  margin-top: 10px;
   margin-bottom: 10px;
   padding: 5px;
-  border: 1px solid #000000;
+  border: 1px solid #ccc;
 }
 
 button[type='submit'] {
   background-color: #007bff;
+  border-radius: 10px;
   color: #fff;
   padding: 10px;
   border: none;
