@@ -115,6 +115,7 @@ export default {
   border-radius: 5px;
   background-color: #fff;
   text-align: center;
+  margin-top: 160px;
 }
 
 h1 {
@@ -138,6 +139,7 @@ h1 {
 }
 
 .form-input {
+  outline: none;
   width: 100%;
   padding: 8px;
   border: 1px solid #ccc;
@@ -150,13 +152,16 @@ h1 {
   padding: 8px;
   border: none;
   border-radius: 5px;
-  background-color: #4285f4;
+  background-color: #007bff;
   color: #fff;
   font-size: 14px;
   text-align: center;
   cursor: pointer;
 }
 
+.form-button:hover {
+  background-color: #0056b3;
+}
 .error-message,
 .success-message {
   margin-top: 20px;
@@ -245,8 +250,11 @@ h1 {
   padding-right: 10px;
   border: 1px solid #ccc;
   border-radius: 10px;
+  cursor: pointer;
 }
-
+.link-item:hover{
+  border: 1px solid #9c9c9c;
+}
 a {
   text-decoration: none;
   color: black;

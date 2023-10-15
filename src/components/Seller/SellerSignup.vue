@@ -5,6 +5,9 @@
     <h3>판매자 회원가입</h3>
     <form @submit.prevent="register" class="form">
       <div class="form-group">
+        
+      <p class="join_caution">회원가입 시 상점을 등록하여 어플 이용자가 상점을 확인할 수 있습니다.</p>
+      <p class="join_caution" style="margin-bottom: 15px;">어플 이용자는 별도의 회원가입 없이 상점 및 상품 정보를 리뷰할 수 있습니다.</p>
         <input type="text" id="username" v-model="username" class="form-input" required placeholder="이름">
       </div>
       <div class="form-group">
@@ -16,7 +19,9 @@
       <div class="form-group">
         <input type="tel" id="phone" v-model="phone" class="form-input" required placeholder="전화번호">
       </div>
-      <button type="submit" class="form-button">가입하기</button>
+      <p class="join_caution"><input type="checkbox" style="margin-top:10px;width: 12px; height: 12px;">&nbsp;회원가입 시 개인정보 수집에 동의하고 가입합니다. (필수)</p> 
+      
+      <button type="submit" class="form-button">회원가입</button>
     </form>
     <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
     <div v-if="successMessage" class="success-message">{{ successMessage }}</div>
@@ -112,6 +117,7 @@ export default {
   border: 1px solid #ccc;
   border-radius: 5px;
   background-color: #fff;
+  margin-top: 160px;
 }
 
 h3 {
@@ -175,5 +181,10 @@ h3 {
   background-color: #4caf50;
   color: #fff;
 }
+.join_caution{
+  text-align: center;
+  font-size: 12px;
+}
+
 
 </style>

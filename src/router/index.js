@@ -14,7 +14,7 @@ import SellerSelect from '@/components/Seller/SellerSelect.vue'
 import SellerInfo from '@/components/Seller/SellerInfo.vue'
 import StoreInfo from '@/components/StoreInfo.vue'
 import FindPassword from '@/components/Seller/SellerFindPassword.vue'
-
+import StorePage from'@/components/StorePage.vue'
 import SearchProduct from '@/components/Search/SearchProduct.vue'
 import SearchMap from '@/components/Search/SearchMap.vue'
 
@@ -110,6 +110,12 @@ const routes = [
     path:'/SearchMap',
     name:'SearchMap',
     component : SearchMap
+  },
+  {
+    path: '/store/:storeId',
+    name: 'StorePage',
+    component: StorePage,
+    props: true
   },
 ]
 

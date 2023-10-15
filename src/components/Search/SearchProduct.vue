@@ -20,14 +20,15 @@
       <h2>검색 결과 총 {{ searchResults.length }}개</h2>
       <p style="font-size: 13px; font-style: bold; text-align: center; margin-bottom: 12px;">상품 선택 시 해당 상품의 상점 위치확인이 가능합니다</p>
       <ul>
+        
         <li v-for="product in searchResults" :key="product.id">
           <v-checkbox v-model="selectedResults" :label="getProductLabel(product)" :value="product"></v-checkbox>
           <button @click="openSearchDialog(product)" class="search-btn-menu">자세히</button>
         </li>
-        <button v-if="canLoadMore" @click="loadMore" class="search-btn">결과 더 보기</button>
+        <button v-if="selectedResults.length > 0" @click="showSelectedProducts" class="view-btn">선택한 상품 위치 보기</button>
+        <button v-if="canLoadMore" @click="loadMoreResults" class="search-btn">결과 더 보기</button>
         <br>
-        <button v-if="selectedResults.length > 0" @click="showSelectedProducts" class="search-btn">총
-          {{ selectedResults.length }}개 선택한 상품 보기</button>
+        
       </ul>
     </div>
     <!-- 검색 아무것도 안했을때 결과   -->
@@ -94,8 +95,16 @@ export default {
   },
   methods: {
     async searchProducts() {
+      this.searchResults = [];
+      this.lastVisible = null;
+      
+      await this.loadMoreResults();
+    },
+
+    async loadMoreResults() {
       try {
         const db = getFirestore();
+
         let productsQuery = query(collection(db, 'products'), orderBy('name'), limit(this.pageSize));
 
         if (this.lastVisible) {
@@ -112,19 +121,12 @@ export default {
           const nameIncludesSearchText = product.name.toLowerCase().includes(this.searchText.toLowerCase().trim());
           const categoryMatchesFilter = this.selectedOption === 'All' || product.category === this.selectedOption;
           return nameIncludesSearchText && categoryMatchesFilter;
-        }));
+         }));
 
-        // If the number of results is less than the page size, there are no more results to load.
-        this.canLoadMore = querySnapshot.docs.length >= this.pageSize;
-      } catch (error) {
-        console.error('검색 실패:', error);
-      }
-    },
-
-    loadMore() {
-      if (this.canLoadMore) {
-        this.searchProducts();
-      }
+         this.canLoadMore = querySnapshot.docs.length >= this.pageSize;
+       } catch (error) {
+         console.error('검색 실패:', error);
+       }
     },
     getProductLabel(product) {
       return `상품명: ${product.name} 가격: ${product.price}원`;
@@ -252,11 +254,15 @@ export default {
 }
 .close-btn{
   border: 1px solid rgb(250, 114, 114);
+  background: rgb(255, 117, 117);
   min-width: 120px;
-  color: rgb(247, 73, 73);
+  color: rgb(255, 255, 255);
+  
 }
 .close-btn:hover{
-  background: rgb(250, 114, 114);
-  color: rgb(255, 255, 255);
+  background: rgb(247, 107, 107);
+}
+.view-btn{
+  text-align: center;
 }
 </style>

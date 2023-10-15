@@ -70,6 +70,7 @@ export default {
   border-radius: 5px;
   background-color: white;
   text-align: center;
+  margin-top: 160px;
 }
 
 .title {
@@ -94,6 +95,7 @@ export default {
 }
 
 .input {
+  outline: none;
   width: 100%;
   padding: 10px;
   font-size: 16px;
