@@ -77,7 +77,7 @@ export default {
 .store-grid {
   display: grid;
   width: 100%;
-  margin-top: 150px;
+  margin-top: 100px;
 
 }
 
