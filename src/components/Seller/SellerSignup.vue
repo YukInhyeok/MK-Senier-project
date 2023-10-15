@@ -117,7 +117,7 @@ export default {
   border: 1px solid #ccc;
   border-radius: 5px;
   background-color: #fff;
-  margin-top: 160px;
+  margin-top: 110px;
 }
 
 h3 {

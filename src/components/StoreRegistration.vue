@@ -3,7 +3,7 @@
     <marketmap @location-updated="updateLocation" />
   </div>
   <div class="form-container">
-    <v-btn @click="openGallery"><v-icon>mdi-camera</v-icon>사진등록하기</v-btn>
+    <v-btn @click="openGallery"><v-icon>mdi-camera</v-icon>대표사진등록</v-btn>
     <input type="file" ref="fileInput" style="display:none" @change="uploadFile">
     <h2>상점 등록</h2>
     <div v-if="images.length > 0" class="gallery">

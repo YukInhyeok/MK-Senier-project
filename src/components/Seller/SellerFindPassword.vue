@@ -70,7 +70,7 @@ export default {
   border-radius: 5px;
   background-color: white;
   text-align: center;
-  margin-top: 160px;
+  margin-top: 110px;
 }
 
 .title {

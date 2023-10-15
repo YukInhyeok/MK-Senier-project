@@ -115,7 +115,7 @@ export default {
   border-radius: 5px;
   background-color: #fff;
   text-align: center;
-  margin-top: 160px;
+  margin-top: 110px;
 }
 
 h1 {
