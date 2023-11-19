@@ -2,15 +2,12 @@
   <v-container>
     <v-row>
       <v-col cols="12" class="Main">
-        <v-card width="100%">
-          <v-img 
-            src="https://cdn.localtoday.co.kr/news/photo/202303/208258_208334_1453.jpg"
-            alt="Image"
-          ></v-img>
-          <p>Hybride</p>
-          <p>Web Application</p> 
-          <p>졸업작품 융합 3조</p>
-        </v-card>
+        <v-carousel hide-delimiters cycle interval="5000" hide-controls>
+          <v-carousel-item v-for="(item, index) in imageArray" :key="index">
+            <v-img :src="item.src" :alt="item.alt"></v-img>
+          </v-carousel-item>
+        </v-carousel>
+
       </v-col>
       <v-col rows="10" class="BTN">
         <v-row justify="center">
@@ -56,6 +53,7 @@
 </template>
 
 <script>
+import {VCarousel, VCarouselItem} from 'vuetify';
 export default {
   name: 'HelloWorld',
 
@@ -66,10 +64,47 @@ export default {
         href: 'tel:042-226-0319'
       },
     ],
+    imageArray:[
+      {
+        src : 'https://i.ibb.co/x6HVSZV/Kakao-Talk-20231120-000102731.png',
+        alt : 'Image 1',
+      },
+      {
+        src :'https://i.ibb.co/mFgZJsr/Kakao-Talk-20231120-000254703.png',
+        alt :'Image 2',
+      },
+      {
+        src : 'https://i.ibb.co/kyn7syd/Kakao-Talk-20231120-000115995.png',
+        alt : 'Image 3',
+      },
+      {
+        src : 'https://i.ibb.co/S7KDhtS/Kakao-Talk-20231120-000133270.png',
+        alt : 'Image 4',
+      },
+      {
+        src : 'https://i.ibb.co/2nTktJT/Kakao-Talk-20231120-000211861.png',
+        alt : 'Image 5',
+      }
+    ],
   }),
+  methods: {
+    hideCarouselControls() {
+      // 캐러셀 컨트롤(버튼)을 숨기는 메소드
+      const carouselControls = document.querySelectorAll('.v-carousel__controls');
+      carouselControls.forEach((control) => {
+        control.style.display = 'none';
+      });
+    },
+  },
+  mounted() {
+    this.hideCarouselControls(); // 컴포넌트가 마운트될 때 캐러셀 컨트롤 숨김
+  },
+  components: {
+    VCarousel,
+    VCarouselItem
+  },
 }
 </script>
-
 <style scoped>
 .Main {
   width: 100%;
@@ -141,5 +176,12 @@ export default {
 a {
   list-style: none;
   text-decoration: none;
+}
+
+.v-btn__overlay{
+  display: none !important;
+}
+.v-btn__underlay {
+  display: none !important;
 }
 </style>
